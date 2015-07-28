@@ -60,6 +60,8 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None, 
 
     verify = not current_app.config['IGNORE_SSL_ERRORS']
 
+    https = urlparse.urlparse(remote_url).scheme == "https"
+
     our_headers = {
         'user-agent': 'pdnscontrol/0',
         'pragma': 'no-cache',
@@ -76,7 +78,10 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None, 
         headers=headers,
         verify=verify,
         auth=auth_from_url(remote_url),
-        timeout=timeout,
+        # Due to: https://github.com/pyca/pyopenssl/issues/168
+        # setting a timeout on a SSL socket currently breaks most
+        # installations.
+        timeout=timeout if not https else None,
         data=data,
         params=params
         )
