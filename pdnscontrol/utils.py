@@ -2,6 +2,7 @@ from flask import request, current_app
 from flask import json
 from flask.ext.security import http_auth_required
 from functools import wraps
+
 import requests
 import urllib
 import urlparse
@@ -51,8 +52,9 @@ def auth_from_url(url):
     return auth
 
 
-def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None, timeout=None, headers=None):
-    if data is not None and type(data) != str:
+def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None,
+                 timeout=None, headers=None):
+    if data is not None and type(data) is not str:
         data = json.dumps(data)
 
     if timeout is None:
@@ -79,7 +81,7 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None, 
         timeout=timeout,
         data=data,
         params=params
-        )
+    )
     try:
         if r.status_code not in (200, 400, 422):
             r.raise_for_status()
@@ -90,8 +92,8 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None, 
 
 
 def fetch_json(remote_url, method='GET', data=None, params=None, headers=None):
-    r = fetch_remote(remote_url, method=method, data=data, params=params, headers=headers,
-                     accept='application/json; q=1')
+    r = fetch_remote(remote_url, method=method, data=data, params=params,
+                     headers=headers, accept='application/json; q=1')
     try:
         assert('json' in r.headers['content-type'])
     except Exception as e:
