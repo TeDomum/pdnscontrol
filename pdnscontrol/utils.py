@@ -56,26 +56,24 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None,
                  timeout=None, headers=None):
     if data is not None and type(data) is not str:
         data = json.dumps(data)
-
     if timeout is None:
         timeout = current_app.config['REMOTE_TIMEOUT']
-
     verify = not current_app.config['IGNORE_SSL_ERRORS']
 
-    our_headers = {
+    request_headers = {
         'user-agent': 'pdnscontrol/0',
         'pragma': 'no-cache',
         'cache-control': 'no-cache'
     }
     if accept is not None:
-        our_headers['accept'] = accept
+        request_headers['accept'] = accept
     if headers is not None:
-        our_headers.update(headers)
+        request_headers.update(headers)
 
     r = requests.request(
         method,
         remote_url,
-        headers=headers,
+        headers=request_headers,
         verify=verify,
         auth=auth_from_url(remote_url),
         timeout=timeout,
@@ -91,8 +89,7 @@ def fetch_json(remote_url, method='GET', data=None, params=None, headers=None):
     r = fetch_remote(remote_url, method=method, data=data, params=params,
                      headers=headers, accept='application/json; q=1')
     if "json" not in r.headers['content-type']:
-        raise ValueError("Expected JSON while fetching %s" + remote_url)
-
+        raise ValueError("Expected JSON while fetching %s" % remote_url)
     # don't use r.json here, as it will read from r.text, which will trigger
     # content encoding auto-detection in almost all cases, WHICH IS EXTREMELY
     # SLOOOOOOOOOOOOOOOOOOOOOOW. just don't.
