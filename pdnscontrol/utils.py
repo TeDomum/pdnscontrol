@@ -4,9 +4,7 @@ from flask.ext.security import http_auth_required
 from functools import wraps
 
 import requests
-import urllib
 import urlparse
-import sys
 
 from pdnscontrol import app
 
