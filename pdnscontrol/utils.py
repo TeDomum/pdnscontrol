@@ -82,22 +82,16 @@ def fetch_remote(remote_url, method='GET', data=None, accept=None, params=None,
         data=data,
         params=params
     )
-    try:
-        if r.status_code not in (200, 400, 422):
-            r.raise_for_status()
-    except Exception as e:
-        raise RuntimeError("While fetching " + remote_url + ": " + str(e)), None, sys.exc_info()[2]
-
+    if r.status_code not in (200, 400, 422):
+        r.raise_for_status()
     return r
 
 
 def fetch_json(remote_url, method='GET', data=None, params=None, headers=None):
     r = fetch_remote(remote_url, method=method, data=data, params=params,
                      headers=headers, accept='application/json; q=1')
-    try:
-        assert('json' in r.headers['content-type'])
-    except Exception as e:
-        raise Exception("While fetching " + remote_url + ": " + str(e)), None, sys.exc_info()[2]
+    if "json" not in r.headers['content-type']:
+        raise ValueError("Expected JSON while fetching %s" + remote_url)
 
     # don't use r.json here, as it will read from r.text, which will trigger
     # content encoding auto-detection in almost all cases, WHICH IS EXTREMELY
