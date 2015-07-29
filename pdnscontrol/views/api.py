@@ -1,4 +1,3 @@
-import urlparse
 from flask import Blueprint, request
 from flask import jsonify, make_response
 from flask.ext.security import roles_required, current_user
