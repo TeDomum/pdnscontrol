@@ -9,6 +9,16 @@ from pdnscontrol.utils import fetch_remote, api_auth_required
 mod = Blueprint('graphite', __name__)
 
 
+IMAGE_TPL = """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+viewBox="0 0 {width} {height}" width="{width}" height="{height}">
+<text x="10" y="20" fill="red" font-size="15">
+{error}
+</text>
+</svg>
+"""
+
+
 @mod.route('/render/', methods=['GET'])
 @api_auth_required
 @roles_required('stats')
@@ -36,18 +46,11 @@ def graphite():
     except Exception as e:
         width = request.values.get('width', '400')
         height = request.values.get('height', '200')
-        image_tpl = """<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-        viewBox="0 0 {width} {height}" width="{width}" height="{height}">
-    <text x="10" y="20" fill="red" font-size="15">
-        {error}
-    </text>
-</svg>"""
-        image = image_tpl.format(**{
-            'error': str(e),
-            'width': width,
-            'height': height
-        })
+        image = IMAGE_TPL.format(
+            error=str(e),
+            width=width,
+            height=height
+        )
         return make_response((
             image,
             500,

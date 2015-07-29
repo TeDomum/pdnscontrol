@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from flask import jsonify
 from flask.ext.security import login_required, roles_required, http_auth_required
 
-from pdnscontrol.models import *
+from pdnscontrol import models
 
 
 mod = Blueprint('pages', __name__)
@@ -13,7 +13,9 @@ mod = Blueprint('pages', __name__)
 @roles_required('stats')
 def servers_json():
     # legacy URL which we need for pdns2graphite for the time being
-    servers = [{'name': s['name'], 'url': s['url'], 'daemon_type': s['daemon_type']} for s in Server.all()]
+    servers = [{'name': s['name'], 'url': s['url'],
+                'daemon_type': s['daemon_type']}
+               for s in models.Server.all()]
     return jsonify(servers=servers)
 
 

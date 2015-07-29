@@ -63,7 +63,8 @@ class User(db.Model, UserMixin, RestModel):
     name = db.Column(db.Unicode(255))
     active = db.Column(db.Boolean())
     password = db.Column('password', db.Unicode(255))
-    roles = db.relationship('UserRole', secondary='users_userroles', backref='users')
+    roles = db.relationship('UserRole', secondary='users_userroles',
+                            backref='users')
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
@@ -71,7 +72,8 @@ class User(db.Model, UserMixin, RestModel):
     current_login_ip = db.Column(db.Unicode(64))
     login_count = db.Column(db.Integer)
     __public_fields__ = ['name', 'email', 'active']
-    __readonly_fields__ = ['confirmed_at', 'last_login_at', 'current_login_at', 'last_login_ip', 'current_login_ip']
+    __readonly_fields__ = ['confirmed_at', 'last_login_at', 'current_login_at',
+                           'last_login_ip', 'current_login_ip']
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -133,7 +135,8 @@ class Server(db.Model, IterableModel, RestModel):
     stats_url = db.Column(db.Unicode(255))
     manager_url = db.Column(db.Unicode(255))
     api_key = db.Column(db.Unicode(255))
-    __public_fields__ = ['name', 'daemon_type', 'stats_url', 'manager_url', 'api_key']
+    __public_fields__ = ['name', 'daemon_type', 'stats_url', 'manager_url',
+                         'api_key']
     __readonly_fields__ = []
     __id_mapped_to__ = 'name'
 

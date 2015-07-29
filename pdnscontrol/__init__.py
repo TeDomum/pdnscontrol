@@ -7,8 +7,9 @@
 #
 
 from flask import Flask, send_from_directory
-import flask.ext.assets
 from flask.ext.security import Security, current_user
+
+import flask.ext.assets
 import os
 
 
@@ -40,7 +41,8 @@ asset_env = flask.ext.assets.Environment(app)
 asset_env.auto_build = app.debug
 asset_env.debug = app.debug
 
-asset_env.register('styles', 'stylesheets/app.css', output='gen/styles-%(version)s.css')
+asset_env.register('styles', 'stylesheets/app.css',
+                   output='gen/styles-%(version)s.css')
 js_libs = [
     'jquery/dist/jquery.js',
     'modernizr/modernizr.js',
@@ -63,7 +65,8 @@ js_libs = [
     'nginfinitescroll/build/ng-infinite-scroll.js'
 ]
 js_libs_files = ['bower_components/'+x for x in js_libs]
-asset_env.register('js_libs', *js_libs_files, output='gen/js-libs-%(version)s.js')
+asset_env.register('js_libs', *js_libs_files,
+                   output='gen/js-libs-%(version)s.js')
 js_app = [
     "util.js",
     "components.js",
@@ -81,20 +84,13 @@ js_app = [
     "control.js"
 ]
 js_app_files = ['js/'+x for x in js_app]
-asset_env.register('js_pdnscontrol', *js_app_files, output='gen/js-app-%(version)s.js')
+asset_env.register('js_pdnscontrol', *js_app_files,
+                   output='gen/js-app-%(version)s.js')
 
 
 @app.errorhandler(404)
 def not_found(error):
     return 'Not found', 404
-
-from pdnscontrol.views import pages, api, graphite
-app.register_blueprint(pages.mod)
-app.register_blueprint(api.mod, url_prefix='/api')
-app.register_blueprint(graphite.mod, url_prefix='/graphite')
-
-from .models import user_datastore
-security = Security(app, user_datastore)
 
 
 @app.context_processor
@@ -115,5 +111,16 @@ def inject_config():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico', mimetype='image/vnd.microsoft.icon'
+    )
+
+
+from pdnscontrol.views import pages, api, graphite
+app.register_blueprint(pages.mod)
+app.register_blueprint(api.mod, url_prefix='/api')
+app.register_blueprint(graphite.mod, url_prefix='/graphite')
+
+from pdnscontrol.models import user_datastore
+security = Security(app, user_datastore)
