@@ -88,10 +88,11 @@ def is_config_password(key):
 
 
 def remove_passwords_if_ineligible(server):
-    obj = dict(server)
-    if not eligible_for_passwords():
-        del obj['api_key']
-    return obj
+    if eligible_for_passwords():
+        return dict(server)
+    else:
+        return {k: v for k, v in server.iteritems()
+                if not is_config_password(k)}
 
 
 @mod.route('/servers', methods=['GET'])
@@ -122,10 +123,6 @@ def server_get(server):
     obj = Server.query.filter_by(name=server).first()
     if not obj:
         return jsonify(errors={'name': "Not found"}), 404
-
-    headers = {}
-    if obj.api_key:
-        headers['X-API-Key'] = obj.api_key
 
     server = obj.to_dict()
 
